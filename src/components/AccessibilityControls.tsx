@@ -5,11 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Settings, Eye, Volume2, Type } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Settings, Eye, Volume2, Type, Palette } from 'lucide-react';
 
 interface AccessibilitySettings {
   fontSize: number;
+  fontFamily: 'default' | 'dyslexia' | 'large-print' | 'mono';
   highContrast: boolean;
+  colorTheme: 'default' | 'dark' | 'yellow-black' | 'blue-white' | 'green-black';
   screenReaderMode: boolean;
   audioFeedback: boolean;
 }
@@ -17,24 +20,20 @@ interface AccessibilitySettings {
 interface AccessibilityControlsProps {
   settings: AccessibilitySettings;
   onUpdateSettings: (settings: Partial<AccessibilitySettings>) => void;
+  themeClasses: any;
 }
 
 export const AccessibilityControls: React.FC<AccessibilityControlsProps> = ({
   settings,
   onUpdateSettings,
+  themeClasses,
 }) => {
-  const cardClass = settings.highContrast 
-    ? 'bg-gray-900 border-gray-700 text-white' 
-    : 'bg-white/80 backdrop-blur-sm border-gray-200';
-
   return (
-    <Card className={`${cardClass} shadow-lg transition-all duration-300`}>
+    <Card className={`${themeClasses.card} shadow-lg transition-all duration-300`}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Settings className={`w-5 h-5 ${
-            settings.highContrast ? 'text-blue-400' : 'text-blue-600'
-          }`} />
-          Accessibility
+          <Settings className="w-5 h-5 text-blue-600" />
+          Accessibility Settings
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -48,17 +47,59 @@ export const AccessibilityControls: React.FC<AccessibilityControlsProps> = ({
             value={[settings.fontSize]}
             onValueChange={(value) => onUpdateSettings({ fontSize: value[0] })}
             min={12}
-            max={24}
+            max={32}
             step={1}
             className="w-full"
           />
+        </div>
+
+        {/* Font Family Selection */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Font Family for Vision Support</Label>
+          <Select 
+            value={settings.fontFamily} 
+            onValueChange={(value: any) => onUpdateSettings({ fontFamily: value })}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="default">Default (System)</SelectItem>
+              <SelectItem value="dyslexia">Dyslexia Friendly</SelectItem>
+              <SelectItem value="large-print">Large Print (Bold)</SelectItem>
+              <SelectItem value="mono">Monospace (Clear)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Color Theme Selection */}
+        <div className="space-y-2">
+          <Label className="flex items-center gap-2 text-sm font-medium">
+            <Palette className="w-4 h-4" />
+            Color Theme for Eye Conditions
+          </Label>
+          <Select 
+            value={settings.colorTheme} 
+            onValueChange={(value: any) => onUpdateSettings({ colorTheme: value })}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="default">Default</SelectItem>
+              <SelectItem value="dark">Dark Mode</SelectItem>
+              <SelectItem value="yellow-black">Yellow on Black (Contrast)</SelectItem>
+              <SelectItem value="blue-white">Blue on White (Calm)</SelectItem>
+              <SelectItem value="green-black">Green on Black (Easy)</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* High Contrast Toggle */}
         <div className="flex items-center justify-between">
           <Label className="flex items-center gap-2 text-sm font-medium">
             <Eye className="w-4 h-4" />
-            High Contrast
+            High Contrast Mode
           </Label>
           <Switch
             checked={settings.highContrast}
@@ -69,7 +110,7 @@ export const AccessibilityControls: React.FC<AccessibilityControlsProps> = ({
         {/* Screen Reader Mode */}
         <div className="flex items-center justify-between">
           <Label className="text-sm font-medium">
-            Screen Reader Mode
+            Screen Reader Announcements
           </Label>
           <Switch
             checked={settings.screenReaderMode}
@@ -95,7 +136,9 @@ export const AccessibilityControls: React.FC<AccessibilityControlsProps> = ({
           size="sm"
           onClick={() => onUpdateSettings({
             fontSize: 16,
+            fontFamily: 'default',
             highContrast: false,
+            colorTheme: 'default',
             screenReaderMode: false,
             audioFeedback: true,
           })}
@@ -103,6 +146,19 @@ export const AccessibilityControls: React.FC<AccessibilityControlsProps> = ({
         >
           Reset to Defaults
         </Button>
+
+        {/* Accessibility Info */}
+        <div className="p-3 rounded-lg border border-blue-200 bg-blue-50">
+          <h4 className="font-medium text-sm mb-2 text-blue-700">
+            🌟 Vision Support Features
+          </h4>
+          <ul className="text-xs space-y-1 text-blue-600">
+            <li>• Dyslexia-friendly fonts available</li>
+            <li>• Color themes for different eye conditions</li>
+            <li>• Large font sizes up to 32px</li>
+            <li>• High contrast modes for low vision</li>
+          </ul>
+        </div>
       </CardContent>
     </Card>
   );

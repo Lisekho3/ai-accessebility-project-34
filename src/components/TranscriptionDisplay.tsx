@@ -9,6 +9,7 @@ interface TranscriptionDisplayProps {
   isProcessing: boolean;
   highContrast: boolean;
   fontSize: number;
+  themeClasses: any;
 }
 
 export const TranscriptionDisplay: React.FC<TranscriptionDisplayProps> = ({
@@ -16,18 +17,13 @@ export const TranscriptionDisplay: React.FC<TranscriptionDisplayProps> = ({
   isProcessing,
   highContrast,
   fontSize,
+  themeClasses,
 }) => {
-  const cardClass = highContrast 
-    ? 'bg-gray-900 border-gray-700 text-white' 
-    : 'bg-white/80 backdrop-blur-sm border-gray-200';
-
   return (
-    <Card className={`${cardClass} shadow-lg transition-all duration-300`}>
+    <Card className={`${themeClasses.card} shadow-lg transition-all duration-300`}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <FileText className={`w-5 h-5 ${
-            highContrast ? 'text-green-400' : 'text-green-600'
-          }`} />
+          <FileText className="w-5 h-5 text-green-600" />
           Live Transcription
           {isProcessing && (
             <Loader className="w-4 h-4 animate-spin text-blue-500" />
@@ -37,25 +33,18 @@ export const TranscriptionDisplay: React.FC<TranscriptionDisplayProps> = ({
       <CardContent>
         <ScrollArea className="h-64 w-full rounded-md border p-4">
           <div 
-            className={`whitespace-pre-wrap ${
-              highContrast ? 'text-gray-100' : 'text-gray-800'
-            }`}
+            className={`whitespace-pre-wrap ${themeClasses.cardText}`}
             style={{ fontSize: `${fontSize}px`, lineHeight: 1.6 }}
           >
             {transcription || (
-              <span className={`italic ${
-                highContrast ? 'text-gray-400' : 'text-gray-500'
-              }`}>
+              <span className="italic opacity-60">
                 Transcription will appear here as you speak...
               </span>
             )}
           </div>
         </ScrollArea>
         
-        {/* Word Count */}
-        <div className={`mt-3 text-sm flex justify-between ${
-          highContrast ? 'text-gray-400' : 'text-gray-600'
-        }`}>
+        <div className={`mt-3 text-sm flex justify-between opacity-70`}>
           <span>
             Words: {transcription.trim().split(/\s+/).filter(Boolean).length}
           </span>

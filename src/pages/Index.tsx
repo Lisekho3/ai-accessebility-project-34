@@ -10,7 +10,7 @@ import { useAccessibility } from '@/hooks/useAccessibility';
 import { useTranscription } from '@/hooks/useTranscription';
 
 const Index = () => {
-  const { settings, updateSettings } = useAccessibility();
+  const { settings, updateSettings, getThemeClasses } = useAccessibility();
   const { 
     transcription, 
     isRecording, 
@@ -21,14 +21,15 @@ const Index = () => {
     exportTranscription 
   } = useTranscription();
 
+  const themeClasses = getThemeClasses();
+
   return (
     <div 
-      className={`min-h-screen transition-all duration-300 ${
-        settings.highContrast 
-          ? 'bg-black text-white' 
-          : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50'
-      }`}
-      style={{ fontSize: `${settings.fontSize}px` }}
+      className={`min-h-screen transition-all duration-300 ${themeClasses.background} ${themeClasses.text}`}
+      style={{ 
+        fontSize: `${settings.fontSize}px`,
+        fontFamily: settings.fontFamily === 'default' ? undefined : settings.fontFamily
+      }}
     >
       <div className="container mx-auto px-4 py-6 max-w-6xl">
         <Header />
@@ -41,14 +42,15 @@ const Index = () => {
               isProcessing={isProcessing}
               onStartRecording={startRecording}
               onStopRecording={stopRecording}
-              highContrast={settings.highContrast}
+              highContrast={settings.highContrast || settings.colorTheme !== 'default'}
             />
             
             <TranscriptionDisplay
               transcription={transcription}
               isProcessing={isProcessing}
-              highContrast={settings.highContrast}
+              highContrast={settings.highContrast || settings.colorTheme !== 'default'}
               fontSize={settings.fontSize}
+              themeClasses={themeClasses}
             />
           </div>
           
@@ -57,18 +59,21 @@ const Index = () => {
             <AccessibilityControls
               settings={settings}
               onUpdateSettings={updateSettings}
+              themeClasses={themeClasses}
             />
             
             <ImageAnalysis
-              highContrast={settings.highContrast}
+              highContrast={settings.highContrast || settings.colorTheme !== 'default'}
               fontSize={settings.fontSize}
+              themeClasses={themeClasses}
             />
             
             <SessionManager
               transcription={transcription}
               onClear={clearTranscription}
               onExport={exportTranscription}
-              highContrast={settings.highContrast}
+              highContrast={settings.highContrast || settings.colorTheme !== 'default'}
+              themeClasses={themeClasses}
             />
           </div>
         </div>

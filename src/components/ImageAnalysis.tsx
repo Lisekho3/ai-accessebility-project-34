@@ -10,11 +10,13 @@ import { toast } from 'sonner';
 interface ImageAnalysisProps {
   highContrast: boolean;
   fontSize: number;
+  themeClasses: any;
 }
 
 export const ImageAnalysis: React.FC<ImageAnalysisProps> = ({
   highContrast,
   fontSize,
+  themeClasses,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { analyzing, result, analyzeImage, captureFromCamera, clearResult } = useImageAnalysis();
@@ -40,12 +42,8 @@ export const ImageAnalysis: React.FC<ImageAnalysisProps> = ({
     }
   };
 
-  const cardClass = highContrast 
-    ? 'bg-gray-900 border-gray-700 text-white' 
-    : 'bg-white/80 backdrop-blur-sm border-gray-200';
-
   return (
-    <Card className={`${cardClass} shadow-lg transition-all duration-300`}>
+    <Card className={`${themeClasses.card} shadow-lg transition-all duration-300`}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Image className={`w-5 h-5 ${
@@ -111,9 +109,7 @@ export const ImageAnalysis: React.FC<ImageAnalysisProps> = ({
             
             <ScrollArea className="h-48 w-full rounded-md border p-3">
               <div 
-                className={`whitespace-pre-wrap ${
-                  highContrast ? 'text-gray-100' : 'text-gray-800'
-                }`}
+                className={`whitespace-pre-wrap ${themeClasses.cardText}`}
                 style={{ fontSize: `${fontSize}px`, lineHeight: 1.5 }}
               >
                 {result}

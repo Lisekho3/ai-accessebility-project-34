@@ -10,13 +10,15 @@ interface SessionManagerProps {
   onClear: () => void;
   onExport: (format: 'txt' | 'pdf') => void;
   highContrast: boolean;
+  themeClasses: any;
 }
 
 export const SessionManager: React.FC<SessionManagerProps> = ({
   transcription,
   onClear,
   onExport,
-  highContrast
+  highContrast,
+  themeClasses
 }) => {
   const handleClear = () => {
     if (transcription && window.confirm('Are you sure you want to clear the transcription?')) {
@@ -34,12 +36,8 @@ export const SessionManager: React.FC<SessionManagerProps> = ({
     toast.success(`Exported as ${format.toUpperCase()}`);
   };
 
-  const cardClass = highContrast 
-    ? 'bg-gray-900 border-gray-700 text-white' 
-    : 'bg-white/80 backdrop-blur-sm border-gray-200';
-
   return (
-    <Card className={`${cardClass} shadow-lg transition-all duration-300`}>
+    <Card className={`${themeClasses.card} shadow-lg transition-all duration-300`}>
       <div className="p-6">
         <div className="flex items-center gap-2 mb-6">
           <Save className={`w-5 h-5 ${

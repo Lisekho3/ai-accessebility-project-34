@@ -1,5 +1,6 @@
 
 import { useState, useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface UseImageAnalysisReturn {
   analyzing: boolean;
@@ -15,59 +16,18 @@ export const useImageAnalysis = (): UseImageAnalysisReturn => {
 
   const analyzeImageWithOpenAI = async (imageBase64: string) => {
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.OPENAI_API_KEY || 'your-openai-api-key-here'}`
-        },
-        body: JSON.stringify({
-          model: "gpt-4-vision-preview",
-          messages: [
-            {
-              role: "user",
-              content: [
-                {
-                  type: "text",
-                  text: "Analyze this image and provide detailed accessibility information including: visual description, text content if any, colors used, objects detected, and suggested alt text for screen readers. Format the response clearly for users with visual impairments."
-                },
-                {
-                  type: "image_url",
-                  image_url: {
-                    url: `data:image/jpeg;base64,${imageBase64}`
-                  }
-                }
-              ]
-            }
-          ],
-          max_tokens: 500
-        })
+      const { data, error } = await supabase.functions.invoke('analyze-image', {
+        body: { imageBase64 }
       });
 
-      if (!response.ok) {
-        throw new Error(`OpenAI API error: ${response.status}`);
+      if (error) {
+        throw error;
       }
 
-      const data = await response.json();
-      return data.choices[0]?.message?.content || 'No analysis available';
+      return data.analysis;
     } catch (error) {
-      console.error('OpenAI API error:', error);
-      // Fallback to mock analysis if API fails
-      return `Image Analysis Results (Demo Mode):
-      
-🔍 Visual Description: The image contains visual elements that have been processed for analysis.
-
-📝 Accessibility Features:
-- Image dimensions and quality assessed
-- Color contrast evaluation performed  
-- Text recognition attempted
-- Object detection completed
-
-🎯 Suggested Alt Text: "Image containing visual content analyzed for accessibility"
-
-⚠️ Note: OpenAI integration requires API key configuration. This is currently running in demo mode.
-
-💡 For full AI-powered analysis, please configure your OpenAI API key in the environment settings.`;
+      console.error('Image analysis error:', error);
+      throw error;
     }
   };
 
@@ -95,7 +55,7 @@ export const useImageAnalysis = (): UseImageAnalysisReturn => {
       setResult(analysis);
     } catch (error) {
       console.error('Error analyzing image:', error);
-      setResult('Error: Failed to analyze image. Please try again or check your API configuration.');
+      setResult('Error: Failed to analyze image. Please check your OpenAI API configuration and try again.');
     } finally {
       setAnalyzing(false);
     }

@@ -5,6 +5,7 @@ import { VoiceRecorder } from '@/components/VoiceRecorder';
 import { TranscriptionDisplay } from '@/components/TranscriptionDisplay';
 import { AccessibilityControls } from '@/components/AccessibilityControls';
 import { SessionManager } from '@/components/SessionManager';
+import { ImageAnalysis } from '@/components/ImageAnalysis';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { useTranscription } from '@/hooks/useTranscription';
 
@@ -56,6 +57,11 @@ const Index = () => {
             <AccessibilityControls
               settings={settings}
               onUpdateSettings={updateSettings}
+            />
+            
+            <ImageAnalysis
+              highContrast={settings.highContrast}
+              fontSize={settings.fontSize}
             />
             
             <SessionManager

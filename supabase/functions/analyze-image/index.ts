@@ -20,6 +20,8 @@ serve(async (req) => {
       throw new Error('OpenAI API key not configured');
     }
 
+    console.log('Making request to OpenAI API...');
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -27,7 +29,7 @@ serve(async (req) => {
         'Authorization': `Bearer ${openAIApiKey}`
       },
       body: JSON.stringify({
-        model: "gpt-4o",
+        model: "gpt-4o-mini",
         messages: [
           {
             role: "user",
@@ -49,12 +51,25 @@ serve(async (req) => {
       })
     });
 
+    console.log('OpenAI API response status:', response.status);
+
     if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error('OpenAI API error details:', errorText);
+      
+      if (response.status === 429) {
+        throw new Error('Rate limit exceeded. Please wait a moment and try again.');
+      } else if (response.status === 401) {
+        throw new Error('Invalid OpenAI API key. Please check your API key configuration.');
+      } else {
+        throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
+      }
     }
 
     const data = await response.json();
     const analysis = data.choices[0]?.message?.content || 'No analysis available';
+
+    console.log('Analysis completed successfully');
 
     return new Response(JSON.stringify({ analysis }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -6,6 +6,7 @@ import { TranscriptionDisplay } from '@/components/TranscriptionDisplay';
 import { AccessibilityControls } from '@/components/AccessibilityControls';
 import { SessionManager } from '@/components/SessionManager';
 import { ImageAnalysis } from '@/components/ImageAnalysis';
+import { TextToSpeech } from '@/components/TextToSpeech';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { useTranscription } from '@/hooks/useTranscription';
 
@@ -15,6 +16,8 @@ const Index = () => {
     transcription, 
     isRecording, 
     isProcessing,
+    confidence,
+    interimText,
     startRecording, 
     stopRecording, 
     clearTranscription,
@@ -48,6 +51,15 @@ const Index = () => {
             <TranscriptionDisplay
               transcription={transcription}
               isProcessing={isProcessing}
+              highContrast={settings.highContrast || settings.colorTheme !== 'default'}
+              fontSize={settings.fontSize}
+              themeClasses={themeClasses}
+              confidence={confidence}
+              interimText={interimText}
+              isRecording={isRecording}
+            />
+
+            <TextToSpeech
               highContrast={settings.highContrast || settings.colorTheme !== 'default'}
               fontSize={settings.fontSize}
               themeClasses={themeClasses}

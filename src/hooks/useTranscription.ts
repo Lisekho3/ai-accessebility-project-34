@@ -5,6 +5,8 @@ interface UseTranscriptionReturn {
   transcription: string;
   isRecording: boolean;
   isProcessing: boolean;
+  confidence: number;
+  interimText: string;
   startRecording: () => void;
   stopRecording: () => void;
   clearTranscription: () => void;
@@ -15,7 +17,8 @@ export const useTranscription = (): UseTranscriptionReturn => {
   const [transcription, setTranscription] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const [confidence, setConfidence] = useState(0);
+  const [interimText, setInterimText] = useState('');
   const recognitionRef = useRef<any>(null);
 
   const startRecording = useCallback(async () => {
@@ -28,51 +31,53 @@ export const useTranscription = (): UseTranscriptionReturn => {
         recognition.continuous = true;
         recognition.interimResults = true;
         recognition.lang = 'en-US';
+        recognition.maxAlternatives = 1;
 
         recognition.onstart = () => {
           setIsRecording(true);
           setIsProcessing(false);
+          setInterimText('');
         };
 
         recognition.onresult = (event: any) => {
           let finalTranscript = '';
-          let interimTranscript = '';
+          let interim = '';
 
           for (let i = 0; i < event.results.length; i++) {
             const transcript = event.results[i][0].transcript;
+            const conf = event.results[i][0].confidence;
+            
             if (event.results[i].isFinal) {
               finalTranscript += transcript + ' ';
+              setConfidence(conf || 0);
             } else {
-              interimTranscript += transcript;
+              interim += transcript;
             }
           }
 
-          setTranscription(prev => {
-            const lines = prev.split('\n');
-            if (interimTranscript) {
-              // Update the last line with interim results
-              lines[lines.length - 1] = finalTranscript + interimTranscript;
-            } else if (finalTranscript) {
-              // Add final transcript
-              if (lines[lines.length - 1] === '') {
-                lines[lines.length - 1] = finalTranscript.trim();
-              } else {
-                lines[lines.length - 1] += finalTranscript.trim();
-              }
-            }
-            return lines.join('\n');
-          });
+          setInterimText(interim);
+
+          if (finalTranscript) {
+            setTranscription(prev => prev + finalTranscript);
+            setInterimText('');
+          }
         };
 
         recognition.onerror = (event: any) => {
           console.error('Speech recognition error:', event.error);
           setIsRecording(false);
           setIsProcessing(false);
+          setInterimText('');
+          
+          if (event.error === 'not-allowed') {
+            alert('Microphone access denied. Please allow microphone access and try again.');
+          }
         };
 
         recognition.onend = () => {
           setIsRecording(false);
           setIsProcessing(false);
+          setInterimText('');
         };
 
         recognitionRef.current = recognition;
@@ -101,10 +106,13 @@ export const useTranscription = (): UseTranscriptionReturn => {
     }
     setIsRecording(false);
     setIsProcessing(false);
+    setInterimText('');
   }, []);
 
   const clearTranscription = useCallback(() => {
     setTranscription('');
+    setInterimText('');
+    setConfidence(0);
   }, []);
 
   const exportTranscription = useCallback((format: 'txt' | 'pdf') => {
@@ -185,6 +193,8 @@ export const useTranscription = (): UseTranscriptionReturn => {
     transcription,
     isRecording,
     isProcessing,
+    confidence,
+    interimText,
     startRecording,
     stopRecording,
     clearTranscription,

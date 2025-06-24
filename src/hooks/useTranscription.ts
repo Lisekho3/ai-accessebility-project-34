@@ -110,39 +110,73 @@ export const useTranscription = (): UseTranscriptionReturn => {
   const exportTranscription = useCallback((format: 'txt' | 'pdf') => {
     if (!transcription.trim()) return;
 
+    const timestamp = new Date().toISOString().slice(0, 10);
+    
     if (format === 'txt') {
-      const blob = new Blob([transcription], { type: 'text/plain' });
+      const blob = new Blob([transcription], { type: 'text/plain;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `transcription-${new Date().toISOString().slice(0, 10)}.txt`;
+      link.download = `transcription-${timestamp}.txt`;
+      link.style.display = 'none';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     } else if (format === 'pdf') {
-      // For PDF export, we'll create a simple HTML-to-PDF solution
+      // Create a proper PDF export using browser's print functionality
+      const printContent = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Voice Transcription - ${timestamp}</title>
+            <style>
+              body { 
+                font-family: Arial, sans-serif; 
+                margin: 40px; 
+                line-height: 1.6; 
+                color: #333;
+              }
+              .header { 
+                border-bottom: 2px solid #333; 
+                padding-bottom: 20px; 
+                margin-bottom: 30px; 
+              }
+              .date { 
+                color: #666; 
+                font-size: 14px; 
+              }
+              .content { 
+                white-space: pre-wrap; 
+                font-size: 16px;
+                line-height: 1.8;
+              }
+              @media print {
+                body { margin: 20px; }
+                .no-print { display: none; }
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>Voice Transcription</h1>
+              <div class="date">Generated on: ${new Date().toLocaleDateString()}</div>
+            </div>
+            <div class="content">${transcription.replace(/\n/g, '<br>')}</div>
+            <script>
+              window.onload = function() {
+                window.print();
+                setTimeout(() => window.close(), 1000);
+              }
+            </script>
+          </body>
+        </html>
+      `;
+      
       const printWindow = window.open('', '_blank');
       if (printWindow) {
-        printWindow.document.write(`
-          <html>
-            <head>
-              <title>Transcription</title>
-              <style>
-                body { font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; }
-                h1 { color: #333; }
-                .content { white-space: pre-wrap; }
-              </style>
-            </head>
-            <body>
-              <h1>Voice Transcription</h1>
-              <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-              <div class="content">${transcription}</div>
-            </body>
-          </html>
-        `);
+        printWindow.document.write(printContent);
         printWindow.document.close();
-        printWindow.print();
       }
     }
   }, [transcription]);

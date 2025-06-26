@@ -144,6 +144,15 @@ const GeminiImageAnalyzer:React.FC<GeminiImageAnalyzerProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Camera capture */}
+        <input 
+            type='file'
+            accept="image/*"
+            capture="environment"
+            onChange={handleImageUpload}
+            ref={cameraInputRef}
+            style={{ display: 'none' }}    
+        />
         {/* Upload Buttons */}
         <div className="grid grid-cols-1 gap-3">
           <Button

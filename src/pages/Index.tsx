@@ -9,6 +9,7 @@ import { ImageAnalysis } from '@/components/ImageAnalysis';
 import { TextToSpeech } from '@/components/TextToSpeech';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import { useTranscription } from '@/hooks/useTranscription';
+import GeminiImageAnalyzer from '@/components/GeminiImageAnalyzer';
 
 const Index = () => {
   const { settings, updateSettings, getThemeClasses } = useAccessibility();
@@ -74,7 +75,13 @@ const Index = () => {
               themeClasses={themeClasses}
             />
             
-            <ImageAnalysis
+{/*             <ImageAnalysis
+              highContrast={settings.highContrast || settings.colorTheme !== 'default'}
+              fontSize={settings.fontSize}
+              themeClasses={themeClasses}
+            /> */}
+
+            <GeminiImageAnalyzer 
               highContrast={settings.highContrast || settings.colorTheme !== 'default'}
               fontSize={settings.fontSize}
               themeClasses={themeClasses}

@@ -155,6 +155,15 @@ const GeminiImageAnalyzer:React.FC<GeminiImageAnalyzerProps> = ({
         />
         {/* Upload Buttons */}
         <div className="grid grid-cols-1 gap-3">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            ref={uploadInputRef}
+            className="hidden"
+          />
+         
+
           <Button
             onClick={() => uploadInputRef.current?.click()}
             disabled={loading}
@@ -174,21 +183,7 @@ const GeminiImageAnalyzer:React.FC<GeminiImageAnalyzerProps> = ({
             Take Photo
           </Button>
 
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageUpload}
-            ref={uploadInputRef}
-            className="hidden"
-          />
-          <input
-            type="file"
-            accept="image/*"
-            capture="environment"
-            onChange={handleImageUpload}
-            ref={cameraInputRef}
-            className="hidden"
-          />
+          
         </div>
 
         {/* Loading Indicator */}

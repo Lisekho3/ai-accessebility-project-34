@@ -173,15 +173,14 @@ const GeminiImageAnalyzer:React.FC<GeminiImageAnalyzerProps> = ({
             <Upload className="w-4 h-4" />
             Upload Image
           </Button>
-          <Button
+          <button
             onClick={() => cameraInputRef.current?.click()}
             disabled={loading}
-            variant="outline"
             className="flex items-center gap-2"
           >
             <Camera className="w-4 h-4" />
             Take Photo
-          </Button>
+          </button>
 
           
         </div>

@@ -175,7 +175,7 @@ const GeminiImageAnalyzer:React.FC<GeminiImageAnalyzerProps> = ({
           </Button>
           <Button
             onClick={() => cameraInputRef.current?.click()}
-            /* disabled={loading} */
+            disabled={loading}
             variant="outline"
             className="flex items-center gap-2"
           >
